@@ -16,24 +16,24 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-extern crate byteorder;
-extern crate osmpbfreader;
+//------------------------------------------------------------------------------------------------//
+// other modules
 
-mod metrics;
-mod pbf;
-mod units;
-
-use self::metrics::*;
-use self::pbf::*;
-
-use clap::App;
+use clap;
+// use log::error;
 use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::rc::Rc;
 use std::time::SystemTime;
+use pbfextractor::{metrics, pbf};
 
-fn main() {
-    let matches = App::new("PBF Extractor")
+//------------------------------------------------------------------------------------------------//
+// own modules
+
+//------------------------------------------------------------------------------------------------//
+
+fn parse_cmdline<'a>() -> clap::ArgMatches<'a> {
+    clap::App::new("PBF Extractor")
         .author("Florian Barth")
         .about("Extracts Graphs with multidimensional costs from PBF files")
         .args_from_usage(
@@ -42,7 +42,31 @@ fn main() {
              <SRTM>       'Directory with srtm files'
              <GRAPH>      'File to write graph to'",
         )
-        .get_matches();
+        .get_matches()
+}
+
+fn __setup_logging(verbosely: bool) {
+    let mut builder = env_logger::Builder::new();
+    // minimum filter-level: `warn`
+    builder.filter(None, log::LevelFilter::Warn);
+    // if verbose logging: log `info` for the server and this repo
+    if verbosely {
+        builder.filter(Some(env!("CARGO_PKG_NAME")), log::LevelFilter::Info);
+    }
+    // overwrite default with environment-variables
+    if let Ok(filters) = std::env::var("RUST_LOG") {
+        builder.parse_filters(&filters);
+    }
+    if let Ok(write_style) = std::env::var("RUST_LOG_STYLE") {
+        builder.parse_write_style(&write_style);
+    }
+    // init
+    builder.init();
+}
+
+fn main() {
+    let matches = parse_cmdline();
+    // setup_logging(matches.is_present("verbose"));
 
     let zip = matches.is_present("z");
 
@@ -51,33 +75,33 @@ fn main() {
         .expect("No PBF File to extract from");
     let srtm_input = matches.value_of("SRTM").expect("No srtm input file given");
     let output = matches.value_of("GRAPH").expect("No output file given");
-    let grid = Grid::new_ptr();
+    let grid = metrics::Grid::new_ptr();
 
-    let dist = Rc::new(Distance);
-    let car = Rc::new(CarSpeed);
-    let fast_car = Rc::new(FastCarSpeed);
-    let truck = Rc::new(TruckSpeed);
+    let dist = Rc::new(metrics::Distance);
+    let car = Rc::new(metrics::CarSpeed);
+    let fast_car = Rc::new(metrics::FastCarSpeed);
+    let truck = Rc::new(metrics::TruckSpeed);
 
-    let _grid_x = Rc::new(GridX(grid.clone()));
-    let _grid_y = Rc::new(GridY(grid.clone()));
-    let _chess = Rc::new(ChessBoard(grid.clone()));
+    let _grid_x = Rc::new(metrics::GridX(grid.clone()));
+    let _grid_y = Rc::new(metrics::GridY(grid.clone()));
+    let _chess = Rc::new(metrics::ChessBoard(grid.clone()));
 
-    let _car_time = Rc::new(TravelTime::new(dist.clone(), car.clone()));
-    let _fast_car_time = Rc::new(TravelTime::new(dist.clone(), fast_car.clone()));
-    let _truck_time = Rc::new(TravelTime::new(dist.clone(), truck.clone()));
+    let _car_time = Rc::new(metrics::TravelTime::new(dist.clone(), car.clone()));
+    let _fast_car_time = Rc::new(metrics::TravelTime::new(dist.clone(), fast_car.clone()));
+    let _truck_time = Rc::new(metrics::TravelTime::new(dist.clone(), truck.clone()));
 
-    let _random = Rc::new(RandomWeights);
+    let _random = Rc::new(metrics::RandomWeights);
 
-    let internal_only_metrics: InternalMetrics = vec![].into_iter().collect();
+    let internal_only_metrics: pbf::InternalMetrics = vec![].into_iter().collect();
 
-    let tag_metrics: TagMetrics = vec![];
-    let node_metrics: NodeMetrics = vec![dist];
-    let cost_metrics: CostMetrics = vec![];
+    let tag_metrics: pbf::TagMetrics = vec![];
+    let node_metrics: pbf::NodeMetrics = vec![dist];
+    let cost_metrics: pbf::CostMetrics = vec![];
 
     let l = pbf::Loader::new(
         pbf_input,
         srtm_input,
-        CarEdgeFilter,
+        metrics::CarEdgeFilter,
         tag_metrics,
         node_metrics,
         cost_metrics,
@@ -95,7 +119,7 @@ fn main() {
     }
 }
 
-fn write_graph<T: EdgeFilter, W: Write>(l: &Loader<T>, mut graph: W) {
+fn write_graph<T: metrics::EdgeFilter, W: Write>(l: &pbf::Loader<T>, mut graph: W) {
     let (nodes, edges) = l.load_graph();
 
     writeln!(&mut graph, "# Build by: pbfextractor").unwrap();
