@@ -34,7 +34,7 @@ pub type MetricIndices = BTreeMap<String, usize>;
 
 pub struct Loader<'a, Filter: EdgeFilter> {
     pbf_path: &'a str,
-    srtm_path: &'a str,
+    srtm_path: Option<&'a str>,
     edge_filter: Filter,
     tag_metrics: TagMetrics,
     node_metrics: NodeMetrics,
@@ -47,7 +47,7 @@ pub struct Loader<'a, Filter: EdgeFilter> {
 impl<'a, Filter: EdgeFilter> Loader<'a, Filter> {
     pub fn new(
         pbf_path: &'a str,
-        srtm_path: &'a str,
+        srtm_path: Option<&'a str>,
         edge_filter: Filter,
         tag_metrics: TagMetrics,
         node_metrics: NodeMetrics,
@@ -265,7 +265,10 @@ impl<'a, Filter: EdgeFilter> Loader<'a, Filter> {
         };
 
         let mut srtm_file = String::new();
-        srtm_file.push_str(self.srtm_path);
+        srtm_file.push_str(match self.srtm_path {
+            Some(srtm_path) => srtm_path,
+            None => return 0.0,
+        });
         srtm_file.push_str(&file_name);
         let mut f = match File::open(&srtm_file) {
             Ok(f) => f,
