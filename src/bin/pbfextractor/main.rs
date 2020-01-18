@@ -140,7 +140,6 @@ fn parse_cmdline<'a>() -> clap::ArgMatches<'a> {
     ]
     .join("\n");
     let arg_internal_only_metrics = clap::Arg::with_name("internal-only-metrics")
-        .short("im")
         .long("internal")
         .value_name("METRIC")
         .help(tmp)
