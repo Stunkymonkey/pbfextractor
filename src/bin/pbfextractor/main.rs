@@ -149,7 +149,7 @@ fn parse_cmdline<'a>() -> clap::ArgMatches<'a> {
 
     // arg: quiet
     let tmp = &[
-        "Logs 'info' in addition to 'warn' and 'error'.",
+        "Doesn't log 'info', but only 'warn' and 'error'.",
         "The env-variable 'RUST_LOG' has precedence.",
     ]
     .join("\n");
