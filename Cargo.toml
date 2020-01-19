@@ -4,11 +4,8 @@ version = "0.1.1"
 description = "Pbfextractor creates graph-files with multidimensional costs from osm-, pbf- and srtm-data"
 edition = "2018"
 
-authors = [
-    "Florian Barth <florianbarth@gmx.de>",
-    "dominicparga <dominic.parga@gmail.com>",
-]
-repository = "https://github.com/dominicparga/pbfextractor"
+authors = ["Florian Barth <florianbarth@gmx.de>"]
+repository = "https://github.com/lesstat/pbfextractor"
 readme = "README.md"
 keywords = ["osm", "parsing", "text", "pbf", "xml"]
 categories = ["algorithms", "data-structures", "parser-implementations", "parsing", ""]
