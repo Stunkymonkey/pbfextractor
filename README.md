@@ -1,38 +1,32 @@
-# Pbfextractor
+# pbfextractor
 
-Pbfextractor is a tool to extract graph files from OSM and SRTM data for the [Cyclops](https://github.com/lesstat/cyclops) project.
-It extracts a graph for cyclists that contains data on the distance, height ascent and road suitability for bicycles.
-The data for road suitability is based on the "highway", "cycleway", "bicycle" and "sidewalk" tags from OSM and has been tested for German graphs.
+[![Tag][github/tags/badge]][github/tags]
+[![License][github/license/badge]][github/license]
+[![Last commit][github/last-commit/badge]][github/last-commit]
 
+`pbfextractor` is a tool to extract graph files from [OpenStreetMap][osm] and SRTM-data for the repo [Cyclops][github/cyclops].
+It extracts a graph for cyclists that contains data on the distance, height-ascent and road-suitability for bicycles.
+The data for road-suitability is based on the tags `highway`, `cycleway`, `bicycle` and `sidewalk` from `OSM` and has been tested for German graphs.
 
-# Usage
+## Usage
 
-Pbfextractor takes three arguments:
-	- a pbf file
-	- the path to a folder with the necassary SRTM files
-	- the path to a file in which to write the graph
+Since this is `rust` ([see here for installation][rust/install]), you can build via `cargo` and run the resulting binary file, or run directly via `cargo`.
 
-``` shell
-pbfextractor [path/to/pbf-file] [folder/with/srtm/files] [path/to/output/file]
-```
-
-# Installation
-
-To Compile and install Pbfextractor you need a current installation of [rust](https://www.rust-lang.org/en-US/install.html).
-After cloning the package, it can be installed with
-
-``` shell
-cargo install --path [path/to/your/bin]
-```
-
-Or you compile it and run it directly from the repository:
-
-``` shell
+```zsh
+# build binary and run it
 cargo build --release
-./target/release/pbfextractor [path/to/pbf-file] [folder/with/srtm/files] [path/to/output/file]
+./target/release/pbfextractor --help
+
+# run via cargo
+cargo run --release -- --help
 ```
 
-
-
-
-
+[github/cyclops]: https://github.com/lesstat/cyclops
+[github/last-commit]: https://github.com/lesstat/pbfextractor/commits
+[github/last-commit/badge]: https://img.shields.io/github/last-commit/lesstat/pbfextractor
+[github/license]: https://github.com/lesstat/pbfextractor/blob/master/LICENSE
+[github/license/badge]: https://img.shields.io/github/license/lesstat/pbfextractor
+[github/tags]: https://github.com/lesstat/pbfextractor/tags
+[github/tags/badge]: https://img.shields.io/github/v/tag/lesstat/pbfextractor?sort=semver
+[osm]: https://openstreetmap.org
+[rust/install]: https://www.rust-lang.org/en-US/install.html
