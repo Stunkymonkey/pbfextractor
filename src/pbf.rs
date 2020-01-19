@@ -264,17 +264,22 @@ impl<'a, Filter: EdgeFilter> Loader<'a, Filter> {
             format!("/N{:02}W{:03}.hgt", north, east.abs())
         };
 
-        let mut srtm_file = String::new();
-        srtm_file.push_str(match self.srtm_path {
-            Some(srtm_path) => srtm_path,
-            None => return 0.0,
-        });
-        srtm_file.push_str(&file_name);
-        let mut f = match File::open(&srtm_file) {
-            Ok(f) => f,
-            Err(_) => {
-                println!("could not find file: {}", file_name);
-                return 0.0;
+        let mut f = {
+            let default_height = 0.0;
+
+            let mut srtm_file = String::new();
+            srtm_file.push_str(match self.srtm_path {
+                Some(srtm_path) => srtm_path,
+                None => return default_height,
+            });
+            srtm_file.push_str(&file_name);
+
+            match File::open(&srtm_file) {
+                Ok(f) => f,
+                Err(_) => {
+                    println!("could not find file: {}", file_name);
+                    return default_height;
+                }
             }
         };
         let lat_offset = 3601.0 - lat.fract() / second;
