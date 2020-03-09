@@ -314,7 +314,7 @@ fn main() -> Result<(), ()> {
     let output_file = File::create(&output_path).unwrap();
     let graph = BufWriter::new(output_file);
     if matches.is_present("zipped") {
-        let graph = flate2::write::GzEncoder::new(graph, flate2::Compression::Best);
+        let graph = flate2::write::GzEncoder::new(graph, flate2::Compression::best());
         write_graph(&l, graph);
     } else {
         write_graph(&l, graph);
